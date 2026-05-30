@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'app' => [
         'name' => 'Atelier Nova',
-        'base_path' => '/projekt/public/index.php',
+        'base_path' => '/webmagazin/public/index.php',
     ],
     'db' => [
         'host' => 'localhost',
