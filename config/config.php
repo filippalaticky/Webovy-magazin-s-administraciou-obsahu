@@ -16,3 +16,4 @@ return [
         'charset' => 'utf8mb4',
     ],
 ];
+//http://localhost/webmagazin/public
