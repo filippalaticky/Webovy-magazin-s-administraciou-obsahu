@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'app' => [
         'name' => 'Atelier Nova',
-        'base_path' => '/webmagazin/public/index.php',
+        'base_path' => '/Webovy-magazin-s-administraciou-obsahu/public/index.php',
     ],
     'db' => [
         'host' => 'localhost',
@@ -16,4 +16,4 @@ return [
         'charset' => 'utf8mb4',
     ],
 ];
-//http://localhost/webmagazin/public
+// http://localhost/Webovy-magazin-s-administraciou-obsahu/public/
