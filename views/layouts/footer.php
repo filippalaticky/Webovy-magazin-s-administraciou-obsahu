@@ -15,6 +15,6 @@
 	</div>
 </div>
 
-<script src="<?= e(app_asset_url('js/app.js')) ?>"></script>
+<script src="<?= $escaper->escape($urlGenerator->assetUrl('js/app.js')) ?>"></script>
 </body>
 </html>

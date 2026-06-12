@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 require __DIR__ . '/../layouts/header.php';
 
+/**
+ * @var array|null $post
+ * @var string $formAction
+ * @var array $errors
+ * @var array $old
+ */
+
 $titleValue = (string) ($old['title'] ?? ($post['title'] ?? ''));
 $excerptValue = (string) ($old['excerpt'] ?? ($post['excerpt'] ?? ''));
 $contentValue = (string) ($old['content'] ?? ($post['content'] ?? ''));

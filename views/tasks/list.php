@@ -3,9 +3,15 @@
 declare(strict_types=1);
 
 require __DIR__ . '/../layouts/header.php';
+
+/**
+ * @var array $tasks
+ * @var string|null $statusFilter
+ * @var string $sort
+ */
 ?>
 <section class="toolbar fade-in">
-    <a class="btn" href="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'create'])) ?>">+ Nova uloha</a>
+    <a class="btn" href="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'task-create'])) ?>">+ Nova uloha</a>
 
     <form method="get" action="<?= $escaper->escape($urlGenerator->indexUrl()) ?>" class="filters">
         <input type="hidden" name="action" value="tasks">
@@ -55,9 +61,9 @@ require __DIR__ . '/../layouts/header.php';
                 >
                     Prepnut stav
                 </button>
-                <a class="btn btn-secondary" href="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'edit', 'id' => (int) $task['id']])) ?>">Upravit</a>
+                <a class="btn btn-secondary" href="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'task-edit', 'id' => (int) $task['id']])) ?>">Upravit</a>
 
-                <form method="post" action="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'delete', 'id' => (int) $task['id']])) ?>" onsubmit="return confirm('Naozaj vymazat?');">
+                <form method="post" action="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'task-delete', 'id' => (int) $task['id']])) ?>" onsubmit="return confirm('Naozaj vymazat?');">
                     <input type="hidden" name="csrf_token" value="<?= $escaper->escape((string) ($_SESSION['csrf_token'] ?? '')) ?>">
                     <button class="btn danger" type="submit">Vymazat</button>
                 </form>

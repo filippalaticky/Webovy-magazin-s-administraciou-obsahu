@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 require __DIR__ . '/../layouts/header.php';
 
+/**
+ * @var array $posts
+ * @var array $featuredPosts
+ */
+
 $highlightPost = $featuredPosts[0] ?? ($posts[0] ?? null);
 ?>
 <section class="hero grid-2">

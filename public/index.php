@@ -9,7 +9,9 @@ use App\UrlGenerator;
 use Config\Database;
 use Controllers\AuthController;
 use Controllers\ContentController;
+use Controllers\TaskController;
 use Models\Post;
+use Models\Task;
 use Models\User;
 
 if (PHP_SAPI !== 'cli') {
@@ -70,8 +72,10 @@ $userModel = new User($pdo);
 $userModel->createDefaultAdminIfNeeded();
 
 $postModel = new Post($pdo);
+$taskModel = new Task($pdo);
 $authController = new AuthController($urlGenerator, $escaper, $userModel);
 $contentController = new ContentController($urlGenerator, $escaper, $postModel);
+$taskController = new TaskController($urlGenerator, $escaper, $taskModel);
 
-$application = new Application($authController, $contentController, $urlGenerator);
+$application = new Application($authController, $contentController, $taskController, $urlGenerator);
 $application->run();

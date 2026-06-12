@@ -47,8 +47,9 @@ class SchemaInitializer
         try {
             $usersCount = (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
             $postsCount = (int) $pdo->query('SELECT COUNT(*) FROM posts')->fetchColumn();
+            $tasksCount = (int) $pdo->query('SELECT COUNT(*) FROM tasks')->fetchColumn();
 
-            return $usersCount >= 0 && $postsCount >= 0;
+            return $usersCount >= 0 && $postsCount >= 0 && $tasksCount >= 0;
         } catch (\PDOException) {
             return false;
         }

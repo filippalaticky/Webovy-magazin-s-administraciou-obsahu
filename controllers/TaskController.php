@@ -44,7 +44,7 @@ class TaskController extends BaseController
             'errors' => $errors,
             'old' => $old,
             'task' => null,
-            'formAction' => $this->urlGenerator->indexUrl(['action' => 'store']),
+            'formAction' => $this->urlGenerator->indexUrl(['action' => 'task-store']),
         ]);
     }
 
@@ -86,7 +86,7 @@ class TaskController extends BaseController
             'errors' => $errors,
             'old' => $old,
             'task' => $task,
-            'formAction' => $this->urlGenerator->indexUrl(['action' => 'update', 'id' => $id]),
+            'formAction' => $this->urlGenerator->indexUrl(['action' => 'task-update', 'id' => $id]),
         ]);
     }
 

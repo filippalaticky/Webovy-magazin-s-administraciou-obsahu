@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 require __DIR__ . '/../layouts/header.php';
 
+/**
+ * @var Task|null $task
+ * @var string $formAction
+ * @var array $errors
+ * @var array $old
+ */
+
 $titleValue = (string) ($old['title'] ?? ($task['title'] ?? ''));
 $descriptionValue = (string) ($old['description'] ?? ($task['description'] ?? ''));
 $statusValue = (string) ($old['status'] ?? ($task['status'] ?? 'pending'));
@@ -27,7 +34,7 @@ $isEdit = $task !== null;
         <input id="title" name="title" type="text" maxlength="255" value="<?= $escaper->escape($titleValue) ?>" required>
 
         <label for="description">Popis</label>
-        <textarea id="description" name="description" rows="6" maxlength="5000"><?= $escaper->escape($descriptionValue) ?></textarea>
+        <textarea id="description" name="description" rows="6" maxlength="5000"><?= $descriptionValue ?></textarea>
 
         <?php if ($isEdit): ?>
             <label for="status">Status</label>

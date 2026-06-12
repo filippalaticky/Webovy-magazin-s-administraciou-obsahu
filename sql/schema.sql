@@ -26,6 +26,15 @@ CREATE TABLE IF NOT EXISTS posts (
     INDEX idx_posts_created_at (created_at)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS tasks (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description MEDIUMTEXT NOT NULL,
+    status ENUM('pending', 'done') NOT NULL DEFAULT 'pending',
+    created_at DATETIME NOT NULL,
+    INDEX idx_tasks_status_created_at (status, created_at)
+) ENGINE=InnoDB;
+
 INSERT INTO posts (title, slug, excerpt, content, cover_image_url, status, is_featured, created_at, updated_at, published_at)
 VALUES
 (

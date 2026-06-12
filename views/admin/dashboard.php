@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 require __DIR__ . '/../layouts/header.php';
+
+/**
+ * @var array $stats
+ * @var array $posts
+ */
 ?>
 <section class="admin-layout">
     <aside class="admin-rail fade-in">
