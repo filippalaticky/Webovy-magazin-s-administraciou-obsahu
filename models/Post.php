@@ -8,6 +8,8 @@ use PDO;
 
 class Post
 {
+    private ?string $tableName = null;
+
     public function __construct(private PDO $pdo)
     {
     }
@@ -15,8 +17,9 @@ class Post
     public function getPublicPosts(int $limit = 6): array
     {
         $limit = max(1, $limit);
+        $table = $this->getTableName();
         $sql = "SELECT id, title, slug, excerpt, content, cover_image_url, status, is_featured, created_at, updated_at, published_at
-                FROM posts
+                FROM {$table}
                 WHERE status = 'published'
                 ORDER BY is_featured DESC, published_at DESC, created_at DESC
                 LIMIT {$limit}";
@@ -27,8 +30,9 @@ class Post
     public function getFeaturedPosts(int $limit = 3): array
     {
         $limit = max(1, $limit);
+        $table = $this->getTableName();
         $sql = "SELECT id, title, slug, excerpt, content, cover_image_url, status, is_featured, created_at, updated_at, published_at
-                FROM posts
+                FROM {$table}
                 WHERE status = 'published' AND is_featured = 1
                 ORDER BY published_at DESC, created_at DESC
                 LIMIT {$limit}";
@@ -38,21 +42,23 @@ class Post
 
     public function getAdminPosts(): array
     {
-        $sql = 'SELECT id, title, slug, excerpt, content, cover_image_url, status, is_featured, created_at, updated_at, published_at
-                FROM posts
-                ORDER BY is_featured DESC, created_at DESC';
+        $table = $this->getTableName();
+        $sql = "SELECT id, title, slug, excerpt, content, cover_image_url, status, is_featured, created_at, updated_at, published_at
+                FROM {$table}
+                ORDER BY is_featured DESC, created_at DESC";
 
         return $this->pdo->query($sql)->fetchAll();
     }
 
     public function getStats(): array
     {
-        $sql = 'SELECT
+        $table = $this->getTableName();
+        $sql = "SELECT
                     COUNT(*) AS total_posts,
-                    SUM(CASE WHEN status = "published" THEN 1 ELSE 0 END) AS published_posts,
-                    SUM(CASE WHEN status = "draft" THEN 1 ELSE 0 END) AS draft_posts,
+                    SUM(CASE WHEN status = 'published' THEN 1 ELSE 0 END) AS published_posts,
+                    SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) AS draft_posts,
                     SUM(CASE WHEN is_featured = 1 THEN 1 ELSE 0 END) AS featured_posts
-                FROM posts';
+                FROM {$table}";
 
         $row = $this->pdo->query($sql)->fetch() ?: [];
 
@@ -66,10 +72,11 @@ class Post
 
     public function getById(int $id): ?array
     {
-        $sql = 'SELECT id, title, slug, excerpt, content, cover_image_url, status, is_featured, created_at, updated_at, published_at
-                FROM posts
+        $table = $this->getTableName();
+        $sql = "SELECT id, title, slug, excerpt, content, cover_image_url, status, is_featured, created_at, updated_at, published_at
+                FROM {$table}
                 WHERE id = :id
-                LIMIT 1';
+                LIMIT 1";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
         $post = $stmt->fetch();
@@ -79,6 +86,7 @@ class Post
 
     public function create(array $data): bool
     {
+        $table = $this->getTableName();
         $title = trim((string) ($data['title'] ?? ''));
         $slug = $this->generateUniqueSlug($title);
         $status = $this->normalizeStatus((string) ($data['status'] ?? 'draft'));
@@ -91,8 +99,8 @@ class Post
             $excerpt = $this->buildExcerpt($content);
         }
 
-        $sql = 'INSERT INTO posts (title, slug, excerpt, content, cover_image_url, status, is_featured, created_at, updated_at, published_at)
-                VALUES (:title, :slug, :excerpt, :content, :cover_image_url, :status, :is_featured, NOW(), NOW(), :published_at)';
+        $sql = "INSERT INTO {$table} (title, slug, excerpt, content, cover_image_url, status, is_featured, created_at, updated_at, published_at)
+                VALUES (:title, :slug, :excerpt, :content, :cover_image_url, :status, :is_featured, NOW(), NOW(), :published_at)";
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([
@@ -109,6 +117,7 @@ class Post
 
     public function update(int $id, array $data): bool
     {
+        $table = $this->getTableName();
         $title = trim((string) ($data['title'] ?? ''));
         $slug = $this->generateUniqueSlug($title, $id);
         $status = $this->normalizeStatus((string) ($data['status'] ?? 'draft'));
@@ -135,7 +144,7 @@ class Post
             $publishedAt = null;
         }
 
-        $sql = 'UPDATE posts
+        $sql = "UPDATE {$table}
                 SET title = :title,
                     slug = :slug,
                     excerpt = :excerpt,
@@ -145,7 +154,7 @@ class Post
                     is_featured = :is_featured,
                     updated_at = NOW(),
                     published_at = :published_at
-                WHERE id = :id';
+                WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([
@@ -163,13 +172,15 @@ class Post
 
     public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare('DELETE FROM posts WHERE id = :id');
+        $table = $this->getTableName();
+        $stmt = $this->pdo->prepare("DELETE FROM {$table} WHERE id = :id");
 
         return $stmt->execute([':id' => $id]);
     }
 
     public function toggleStatus(int $id): ?string
     {
+        $table = $this->getTableName();
         $post = $this->getById($id);
 
         if ($post === null) {
@@ -179,7 +190,7 @@ class Post
         $newStatus = $post['status'] === 'published' ? 'draft' : 'published';
         $publishedAt = $newStatus === 'published' ? date('Y-m-d H:i:s') : null;
 
-        $stmt = $this->pdo->prepare('UPDATE posts SET status = :status, published_at = :published_at, updated_at = NOW() WHERE id = :id');
+        $stmt = $this->pdo->prepare("UPDATE {$table} SET status = :status, published_at = :published_at, updated_at = NOW() WHERE id = :id");
         $stmt->execute([
             ':id' => $id,
             ':status' => $newStatus,
@@ -191,6 +202,7 @@ class Post
 
     public function toggleFeatured(int $id): ?int
     {
+        $table = $this->getTableName();
         $post = $this->getById($id);
 
         if ($post === null) {
@@ -198,7 +210,7 @@ class Post
         }
 
         $newValue = (int) ((int) $post['is_featured'] === 1 ? 0 : 1);
-        $stmt = $this->pdo->prepare('UPDATE posts SET is_featured = :is_featured, updated_at = NOW() WHERE id = :id');
+        $stmt = $this->pdo->prepare("UPDATE {$table} SET is_featured = :is_featured, updated_at = NOW() WHERE id = :id");
         $stmt->execute([
             ':id' => $id,
             ':is_featured' => $newValue,
@@ -228,7 +240,8 @@ class Post
 
     private function slugExists(string $slug, ?int $ignoreId = null): bool
     {
-        $sql = 'SELECT id FROM posts WHERE slug = :slug';
+        $table = $this->getTableName();
+        $sql = "SELECT id FROM {$table} WHERE slug = :slug";
         $params = [':slug' => $slug];
 
         if ($ignoreId !== null) {
@@ -268,5 +281,33 @@ class Post
         }
 
         return mb_substr($plain, 0, 177) . '...';
+    }
+
+    private function getTableName(): string
+    {
+        if ($this->tableName !== null) {
+            return $this->tableName;
+        }
+
+        foreach (['posts', 'todo_app_posts'] as $candidate) {
+            if ($this->tableExists($candidate)) {
+                $this->tableName = $candidate;
+
+                return $this->tableName;
+            }
+        }
+
+        $this->tableName = 'posts';
+
+        return $this->tableName;
+    }
+
+    private function tableExists(string $tableName): bool
+    {
+        $sql = 'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = :table_name';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':table_name' => $tableName]);
+
+        return (int) $stmt->fetchColumn() > 0;
     }
 }
