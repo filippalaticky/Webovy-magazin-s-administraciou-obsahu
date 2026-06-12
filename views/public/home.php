@@ -13,7 +13,7 @@ $highlightPost = $featuredPosts[0] ?? ($posts[0] ?? null);
         <p class="lead">Návštevník vidí čistú verejnú stránku, administrátor má za tlačidlom vpravo hore zabezpečený prístup do správy článkov.</p>
 
         <div class="hero-actions">
-            <a class="btn" href="<?= e(app_index_url(['action' => 'admin'])) ?>">Otvorit admin panel</a>
+            <a class="btn" href="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'admin'])) ?>">Otvorit admin panel</a>
             <a class="btn btn-secondary" href="#posts">Pozriet obsah</a>
         </div>
 
@@ -37,12 +37,12 @@ $highlightPost = $featuredPosts[0] ?? ($posts[0] ?? null);
         <?php if ($highlightPost !== null): ?>
             <span class="section-label">Featured story</span>
             <?php if (!empty($highlightPost['cover_image_url'])): ?>
-                <img class="hero-image" src="<?= e((string) $highlightPost['cover_image_url']) ?>" alt="<?= e((string) $highlightPost['title']) ?>">
+                <img class="hero-image" src="<?= $escaper->escape((string) $highlightPost['cover_image_url']) ?>" alt="<?= $escaper->escape((string) $highlightPost['title']) ?>">
             <?php endif; ?>
-            <h2><?= e((string) $highlightPost['title']) ?></h2>
-            <p><?= e((string) $highlightPost['excerpt']) ?></p>
+            <h2><?= $escaper->escape((string) $highlightPost['title']) ?></h2>
+            <p><?= $escaper->escape((string) $highlightPost['excerpt']) ?></p>
             <div class="meta-row">
-                <span><?= e((string) $highlightPost['published_at']) ?></span>
+                <span><?= $escaper->escape((string) $highlightPost['published_at']) ?></span>
                 <span class="badge <?= !empty($highlightPost['is_featured']) ? 'featured' : 'regular' ?>">featured</span>
             </div>
         <?php else: ?>
@@ -64,15 +64,15 @@ $highlightPost = $featuredPosts[0] ?? ($posts[0] ?? null);
     <?php foreach ($posts as $post): ?>
         <article class="post-card <?= !empty($post['is_featured']) ? 'is-featured' : '' ?> fade-in">
             <?php if (!empty($post['cover_image_url'])): ?>
-                <img class="post-cover" src="<?= e((string) $post['cover_image_url']) ?>" alt="<?= e((string) $post['title']) ?>">
+                <img class="post-cover" src="<?= $escaper->escape((string) $post['cover_image_url']) ?>" alt="<?= $escaper->escape((string) $post['title']) ?>">
             <?php endif; ?>
             <div class="post-body">
                 <div class="post-topline">
                     <span class="badge <?= !empty($post['is_featured']) ? 'featured' : 'regular' ?>"><?= !empty($post['is_featured']) ? 'featured' : 'story' ?></span>
-                    <span class="post-date"><?= e((string) $post['published_at']) ?></span>
+                    <span class="post-date"><?= $escaper->escape((string) $post['published_at']) ?></span>
                 </div>
-                <h3><?= e((string) $post['title']) ?></h3>
-                <p><?= e((string) $post['excerpt']) ?></p>
+                <h3><?= $escaper->escape((string) $post['title']) ?></h3>
+                <p><?= $escaper->escape((string) $post['excerpt']) ?></p>
             </div>
         </article>
     <?php endforeach; ?>
@@ -84,7 +84,7 @@ $highlightPost = $featuredPosts[0] ?? ($posts[0] ?? null);
         <h2>Obsah spravuješ cez zabezpečený admin panel.</h2>
         <p>Prihlásenie je postavené na hashi hesla, session cookie a CSRF ochrane. Verejná stránka zostáva otvorená pre každého.</p>
     </div>
-    <a class="btn" href="<?= e(app_index_url(['action' => 'admin'])) ?>">Prejsť do administrácie</a>
+    <a class="btn" href="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'admin'])) ?>">Prejsť do administrácie</a>
 </section>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>

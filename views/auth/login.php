@@ -11,13 +11,13 @@ require __DIR__ . '/../layouts/header.php';
     <?php if (!empty($errors)): ?>
         <div class="alert">
             <?php foreach ($errors as $error): ?>
-                <p><?= e((string) $error) ?></p>
+                <p><?= $escaper->escape((string) $error) ?></p>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
 
-    <form method="post" action="<?= e(app_index_url(['action' => 'login'])) ?>" class="form-grid">
-        <input type="hidden" name="csrf_token" value="<?= e((string) ($_SESSION['csrf_token'] ?? '')) ?>">
+    <form method="post" action="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'login'])) ?>" class="form-grid">
+        <input type="hidden" name="csrf_token" value="<?= $escaper->escape((string) ($_SESSION['csrf_token'] ?? '')) ?>">
 
         <label for="username">Meno</label>
         <input id="username" name="username" type="text" maxlength="120" required>

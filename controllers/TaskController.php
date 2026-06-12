@@ -8,8 +8,9 @@ use Models\Task;
 
 class TaskController extends BaseController
 {
-    public function __construct(private Task $taskModel)
+    public function __construct(\App\UrlGenerator $urlGenerator, \App\Escaper $escaper, private Task $taskModel)
     {
+        parent::__construct($urlGenerator, $escaper);
     }
 
     public function index(array $query): void
@@ -43,7 +44,7 @@ class TaskController extends BaseController
             'errors' => $errors,
             'old' => $old,
             'task' => null,
-            'formAction' => app_index_url(['action' => 'store']),
+            'formAction' => $this->urlGenerator->indexUrl(['action' => 'store']),
         ]);
     }
 
@@ -67,7 +68,7 @@ class TaskController extends BaseController
         }
 
         $this->taskModel->create($title, $description);
-        $this->redirect(app_index_url(['action' => 'tasks']));
+        $this->redirect($this->urlGenerator->indexUrl(['action' => 'tasks']));
     }
 
     public function editForm(int $id, array $errors = [], array $old = []): void
@@ -77,7 +78,7 @@ class TaskController extends BaseController
 
         $task = $this->taskModel->getById($id);
         if ($task === null) {
-            $this->redirect(app_index_url(['action' => 'tasks']));
+            $this->redirect($this->urlGenerator->indexUrl(['action' => 'tasks']));
         }
 
         $this->render('tasks/form', [
@@ -85,7 +86,7 @@ class TaskController extends BaseController
             'errors' => $errors,
             'old' => $old,
             'task' => $task,
-            'formAction' => app_index_url(['action' => 'update', 'id' => $id]),
+            'formAction' => $this->urlGenerator->indexUrl(['action' => 'update', 'id' => $id]),
         ]);
     }
 
@@ -114,7 +115,7 @@ class TaskController extends BaseController
         }
 
         $this->taskModel->update($id, $title, $description, $status);
-        $this->redirect(app_index_url(['action' => 'tasks']));
+        $this->redirect($this->urlGenerator->indexUrl(['action' => 'tasks']));
     }
 
     public function destroy(int $id, array $postData): void
@@ -123,11 +124,11 @@ class TaskController extends BaseController
         $this->ensureCsrfToken();
 
         if (!$this->checkCsrfToken((string) ($postData['csrf_token'] ?? ''))) {
-            $this->redirect(app_index_url(['action' => 'tasks']));
+            $this->redirect($this->urlGenerator->indexUrl(['action' => 'tasks']));
         }
 
         $this->taskModel->delete($id);
-        $this->redirect(app_index_url(['action' => 'tasks']));
+        $this->redirect($this->urlGenerator->indexUrl(['action' => 'tasks']));
     }
 
     public function toggleAjax(int $id, array $postData): void

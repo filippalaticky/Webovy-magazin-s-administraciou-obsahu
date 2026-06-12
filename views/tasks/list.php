@@ -5,9 +5,9 @@ declare(strict_types=1);
 require __DIR__ . '/../layouts/header.php';
 ?>
 <section class="toolbar fade-in">
-    <a class="btn" href="<?= e(app_index_url(['action' => 'create'])) ?>">+ Nova uloha</a>
+    <a class="btn" href="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'create'])) ?>">+ Nova uloha</a>
 
-    <form method="get" action="<?= e(app_index_url()) ?>" class="filters">
+    <form method="get" action="<?= $escaper->escape($urlGenerator->indexUrl()) ?>" class="filters">
         <input type="hidden" name="action" value="tasks">
 
         <label for="status">Filter</label>
@@ -38,14 +38,14 @@ require __DIR__ . '/../layouts/header.php';
     <?php foreach ($tasks as $task): ?>
         <article class="card task-card fade-in" data-task-id="<?= (int) $task['id'] ?>">
             <header>
-                <h3><?= e((string) $task['title']) ?></h3>
+                <h3><?= $escaper->escape((string) $task['title']) ?></h3>
                 <span class="badge <?= $task['status'] === 'done' ? 'done' : 'pending' ?>" data-role="status-badge">
-                    <?= e((string) $task['status']) ?>
+                    <?= $escaper->escape((string) $task['status']) ?>
                 </span>
             </header>
 
-            <p><?= nl2br(e((string) $task['description'])) ?></p>
-            <small>Vytvorene: <?= e((string) $task['created_at']) ?></small>
+            <p><?= nl2br($escaper->escape((string) $task['description'])) ?></p>
+            <small>Vytvorene: <?= $escaper->escape((string) $task['created_at']) ?></small>
 
             <div class="actions">
                 <button
@@ -55,10 +55,10 @@ require __DIR__ . '/../layouts/header.php';
                 >
                     Prepnut stav
                 </button>
-                <a class="btn btn-secondary" href="<?= e(app_index_url(['action' => 'edit', 'id' => (int) $task['id']])) ?>">Upravit</a>
+                <a class="btn btn-secondary" href="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'edit', 'id' => (int) $task['id']])) ?>">Upravit</a>
 
-                <form method="post" action="<?= e(app_index_url(['action' => 'delete', 'id' => (int) $task['id']])) ?>" onsubmit="return confirm('Naozaj vymazat?');">
-                    <input type="hidden" name="csrf_token" value="<?= e((string) ($_SESSION['csrf_token'] ?? '')) ?>">
+                <form method="post" action="<?= $escaper->escape($urlGenerator->indexUrl(['action' => 'delete', 'id' => (int) $task['id']])) ?>" onsubmit="return confirm('Naozaj vymazat?');">
+                    <input type="hidden" name="csrf_token" value="<?= $escaper->escape((string) ($_SESSION['csrf_token'] ?? '')) ?>">
                     <button class="btn danger" type="submit">Vymazat</button>
                 </form>
             </div>

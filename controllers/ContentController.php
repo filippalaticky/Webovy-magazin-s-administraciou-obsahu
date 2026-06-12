@@ -8,8 +8,9 @@ use Models\Post;
 
 class ContentController extends BaseController
 {
-    public function __construct(private Post $postModel)
+    public function __construct(\App\UrlGenerator $urlGenerator, \App\Escaper $escaper, private Post $postModel)
     {
+        parent::__construct($urlGenerator, $escaper);
     }
 
     public function home(): void
@@ -51,7 +52,7 @@ class ContentController extends BaseController
             'errors' => $errors,
             'old' => $old,
             'post' => null,
-            'formAction' => app_index_url(['action' => 'post-store']),
+            'formAction' => $this->urlGenerator->indexUrl(['action' => 'post-store']),
         ]);
     }
 
@@ -72,7 +73,7 @@ class ContentController extends BaseController
         }
 
         $this->postModel->create($postData);
-        $this->redirect(app_index_url(['action' => 'admin']));
+        $this->redirect($this->urlGenerator->indexUrl(['action' => 'admin']));
     }
 
     public function editForm(int $id, array $errors = [], array $old = []): void
@@ -82,7 +83,7 @@ class ContentController extends BaseController
 
         $post = $this->postModel->getById($id);
         if ($post === null) {
-            $this->redirect(app_index_url(['action' => 'admin']));
+            $this->redirect($this->urlGenerator->indexUrl(['action' => 'admin']));
         }
 
         $this->render('admin/form', [
@@ -91,7 +92,7 @@ class ContentController extends BaseController
             'errors' => $errors,
             'old' => $old,
             'post' => $post,
-            'formAction' => app_index_url(['action' => 'post-update', 'id' => $id]),
+            'formAction' => $this->urlGenerator->indexUrl(['action' => 'post-update', 'id' => $id]),
         ]);
     }
 
@@ -112,7 +113,7 @@ class ContentController extends BaseController
         }
 
         $this->postModel->update($id, $postData);
-        $this->redirect(app_index_url(['action' => 'admin']));
+        $this->redirect($this->urlGenerator->indexUrl(['action' => 'admin']));
     }
 
     public function destroy(int $id, array $postData): void
@@ -121,11 +122,11 @@ class ContentController extends BaseController
         $this->ensureCsrfToken();
 
         if (!$this->checkCsrfToken((string) ($postData['csrf_token'] ?? ''))) {
-            $this->redirect(app_index_url(['action' => 'admin']));
+            $this->redirect($this->urlGenerator->indexUrl(['action' => 'admin']));
         }
 
         $this->postModel->delete($id);
-        $this->redirect(app_index_url(['action' => 'admin']));
+        $this->redirect($this->urlGenerator->indexUrl(['action' => 'admin']));
     }
 
     public function toggleStatus(int $id, array $postData): void
@@ -134,11 +135,11 @@ class ContentController extends BaseController
         $this->ensureCsrfToken();
 
         if (!$this->checkCsrfToken((string) ($postData['csrf_token'] ?? ''))) {
-            $this->redirect(app_index_url(['action' => 'admin']));
+            $this->redirect($this->urlGenerator->indexUrl(['action' => 'admin']));
         }
 
         $this->postModel->toggleStatus($id);
-        $this->redirect(app_index_url(['action' => 'admin']));
+        $this->redirect($this->urlGenerator->indexUrl(['action' => 'admin']));
     }
 
     public function toggleFeatured(int $id, array $postData): void
@@ -147,11 +148,11 @@ class ContentController extends BaseController
         $this->ensureCsrfToken();
 
         if (!$this->checkCsrfToken((string) ($postData['csrf_token'] ?? ''))) {
-            $this->redirect(app_index_url(['action' => 'admin']));
+            $this->redirect($this->urlGenerator->indexUrl(['action' => 'admin']));
         }
 
         $this->postModel->toggleFeatured($id);
-        $this->redirect(app_index_url(['action' => 'admin']));
+        $this->redirect($this->urlGenerator->indexUrl(['action' => 'admin']));
     }
 
     private function validatePostInput(array $postData): array

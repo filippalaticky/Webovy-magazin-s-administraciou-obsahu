@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+use App\Application;
+use App\Escaper;
+use App\UrlGenerator;
+use Config\Database;
+use Controllers\AuthController;
+use Controllers\ContentController;
+use Models\Post;
+use Models\User;
+
 if (PHP_SAPI !== 'cli') {
     $cookieParams = session_get_cookie_params();
     session_set_cookie_params([
@@ -16,10 +25,9 @@ if (PHP_SAPI !== 'cli') {
 
 session_start();
 
-require __DIR__ . '/../config/helpers.php';
-
 spl_autoload_register(static function (string $class): void {
     $prefixes = [
+        'App\\' => __DIR__ . '/../app/',
         'Config\\' => __DIR__ . '/../config/',
         'Models\\' => __DIR__ . '/../models/',
         'Controllers\\' => __DIR__ . '/../controllers/',
@@ -43,14 +51,8 @@ spl_autoload_register(static function (string $class): void {
 
 $config = require __DIR__ . '/../config/config.php';
 
-use Config\Database;
-use Controllers\AuthController;
-use Controllers\ContentController;
-use Models\Post;
-use Models\User;
-
 try {
-    $pdo = Database::getInstance($config['db'])->getConnection();
+    $pdo = Database::getInstance($config->db())->getConnection();
 } catch (PDOException $exception) {
     http_response_code(500);
     echo '<h1>Database Error</h1>';
@@ -58,99 +60,15 @@ try {
     exit;
 }
 
+$urlGenerator = new UrlGenerator();
+$escaper = new Escaper();
+
 $userModel = new User($pdo);
 $userModel->createDefaultAdminIfNeeded();
 
 $postModel = new Post($pdo);
-$authController = new AuthController($userModel);
-$contentController = new ContentController($postModel);
+$authController = new AuthController($urlGenerator, $escaper, $userModel);
+$contentController = new ContentController($urlGenerator, $escaper, $postModel);
 
-$action = isset($_GET['action']) ? (string) $_GET['action'] : 'home';
-$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-
-switch ($action) {
-    case 'home':
-        $contentController->home();
-        break;
-
-    case 'admin':
-        $contentController->dashboard();
-        break;
-
-    case 'login':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $authController->login($_POST);
-            break;
-        }
-
-        $authController->showLogin();
-        break;
-
-    case 'logout':
-        $authController->logout();
-        break;
-
-    case 'post-create':
-        $contentController->createForm();
-        break;
-
-    case 'post-store':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $contentController->store($_POST);
-            break;
-        }
-
-        header('Location: ' . app_index_url(['action' => 'admin']));
-        exit;
-
-    case 'post-edit':
-        if ($id > 0) {
-            $contentController->editForm($id);
-            break;
-        }
-
-        header('Location: ' . app_index_url(['action' => 'admin']));
-        exit;
-
-    case 'post-update':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id > 0) {
-            $contentController->update($id, $_POST);
-            break;
-        }
-
-        header('Location: ' . app_index_url(['action' => 'admin']));
-        exit;
-
-    case 'post-delete':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id > 0) {
-            $contentController->destroy($id, $_POST);
-            break;
-        }
-
-        header('Location: ' . app_index_url(['action' => 'admin']));
-        exit;
-
-    case 'post-toggle-status':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id > 0) {
-            $contentController->toggleStatus($id, $_POST);
-            break;
-        }
-
-        http_response_code(405);
-        echo 'Method not allowed';
-        break;
-
-    case 'post-toggle-featured':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id > 0) {
-            $contentController->toggleFeatured($id, $_POST);
-            break;
-        }
-
-        http_response_code(405);
-        echo 'Method not allowed';
-        break;
-
-    default:
-        header('Location: ' . app_index_url(['action' => 'home']));
-        exit;
-}
+$application = new Application($authController, $contentController, $urlGenerator);
+$application->run();

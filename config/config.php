@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-return [
+return new Config\AppConfig([
     'app' => [
         'name' => 'Atelier Nova',
         'base_path' => '/Webovy-magazin-s-administraciou-obsahu/public/index.php',
@@ -15,5 +15,6 @@ return [
         'password' => '',
         'charset' => 'utf8mb4',
     ],
-];
-// http://localhost/Webovy-magazin-s-administraciou-obsahu/public/
+]);
+
+//http://localhost/webmagazin/public/index.php?action=home

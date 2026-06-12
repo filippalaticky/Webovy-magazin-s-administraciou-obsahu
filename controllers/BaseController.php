@@ -6,8 +6,17 @@ namespace Controllers;
 
 class BaseController
 {
+    public function __construct(
+        protected \App\UrlGenerator $urlGenerator,
+        protected \App\Escaper $escaper
+    ) {
+    }
+
     protected function render(string $viewPath, array $data = []): void
     {
+        $data['urlGenerator'] = $this->urlGenerator;
+        $data['escaper'] = $this->escaper;
+
         extract($data, EXTR_SKIP);
         require __DIR__ . '/../views/' . $viewPath . '.php';
     }
@@ -42,7 +51,7 @@ class BaseController
     protected function requireAdmin(): void
     {
         if (!isset($_SESSION['user_id'])) {
-            $this->redirect(app_index_url(['action' => 'login']));
+            $this->redirect($this->urlGenerator->indexUrl(['action' => 'login']));
         }
     }
 }

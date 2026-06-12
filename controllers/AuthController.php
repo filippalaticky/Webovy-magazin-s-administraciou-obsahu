@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Controllers;
 
+use App\Escaper;
+use App\UrlGenerator;
 use Models\User;
 
 class AuthController extends BaseController
 {
-    public function __construct(private User $userModel)
+    public function __construct(UrlGenerator $urlGenerator, Escaper $escaper, private User $userModel)
     {
+        parent::__construct($urlGenerator, $escaper);
     }
 
     public function showLogin(array $errors = []): void
@@ -54,7 +57,7 @@ class AuthController extends BaseController
         $_SESSION['user_id'] = (int) $user['id'];
         $_SESSION['username'] = $user['username'];
 
-        $this->redirect(app_index_url(['action' => 'admin']));
+        $this->redirect($this->urlGenerator->indexUrl(['action' => 'admin']));
     }
 
     public function logout(): void
@@ -75,6 +78,6 @@ class AuthController extends BaseController
         }
 
         session_destroy();
-        $this->redirect(app_index_url(['action' => 'home']));
+        $this->redirect($this->urlGenerator->indexUrl(['action' => 'home']));
     }
 }
