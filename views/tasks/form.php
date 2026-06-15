@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Models\Task;
+
 require __DIR__ . '/../layouts/header.php';
 
 /**
@@ -34,7 +36,7 @@ $isEdit = $task !== null;
         <input id="title" name="title" type="text" maxlength="255" value="<?= $escaper->escape($titleValue) ?>" required>
 
         <label for="description">Popis</label>
-        <textarea id="description" name="description" rows="6" maxlength="5000"><?= $descriptionValue ?></textarea>
+        <textarea id="description" name="description" rows="6" maxlength="5000"><?= $escaper->escape($descriptionValue) ?></textarea>
 
         <?php if ($isEdit): ?>
             <label for="status">Status</label>
