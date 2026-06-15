@@ -17,4 +17,4 @@ return new Config\AppConfig([
     ],
 ]);
 
-//http://localhost/webmagazin/public/index.php?action=home
+//http://localhost/Webovy-magazin-s-administraciou-obsahu/public/index.php?action=home
